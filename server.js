@@ -4,7 +4,7 @@ import schema from "./graphql/schema.js";
 import "./db/mongo-connect.js";
 import config from "./config.js";
 // import auth from "./middlewares/authenticate.js";
-// import cors from "cors";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import authenticate from "./middlewares/authenticate.js";
 
