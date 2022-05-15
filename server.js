@@ -3,13 +3,13 @@ import { graphqlHTTP } from "express-graphql";
 import schema from "./graphql/schema.js";
 import "./db/mongo-connect.js";
 import config from "./config.js";
-// import auth from "./middlewares/authenticate.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authenticate from "./middlewares/authenticate.js";
 
 const app = express();
-// app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(express.json({ limit: "10MB" }));
+app.use(cors({ origin: config.frontendOrigin, credentials: true }));
 app.use(cookieParser());
 app.use(authenticate);
 
@@ -19,11 +19,20 @@ app.get("/", (req, res) => {
 
 app.use(
   "/graphql",
-  graphqlHTTP({
-    schema,
-    graphiql: true,
+  graphqlHTTP((req) => {
+    console.log("req.body =>", req.body);
+    return {
+      schema,
+      graphiql: true,
+    };
   })
 );
+
+app.use((req, res, next) => {
+  const error = new Error(`Looks like you are lost...`);
+  error.status = 400;
+  next(error);
+});
 
 app.listen(config.port, () => {
   console.log(`App listening 🦻 at http://localhost:8000`);

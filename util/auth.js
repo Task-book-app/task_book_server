@@ -13,6 +13,10 @@ export const hashPassword = (password) => {
   return bcrypt.hashSync(password, 9);
 };
 
+export const passwordIsValid = (inputPassword, userPassword) => {
+  return bcrypt.compareSync(inputPassword, userPassword);
+};
+
 export const initialUsername = (email) => {
   return email.split("@")[0];
 };
@@ -53,6 +57,7 @@ export const isValidPassword = (password) => {
   if (!password.match(numbers))
     throw new Error("Password must contain a number");
 
+  // Validate simbols
   const simbols = /[^A-Za-z0-9]/;
   if (!password.match(simbols))
     throw new Error(
