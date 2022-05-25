@@ -5,6 +5,7 @@ import {
   hashPassword,
   createJWToken,
   initialUsername,
+  trimed,
   isValidEmail,
   isValidPassword,
   passwordIsValid,
@@ -67,10 +68,13 @@ export const login = {
     email: { type: GraphQLString },
     password: { type: GraphQLString },
   },
-  async resolve(_, args, { req, res, next }) {
-    console.log(req);
+  resolve: async (_, args, { res, next }) => {
     try {
-      const user = await User.findOne({ email: args.email }).select(
+      const emailTrimed = trimed(args.email);
+      if (!isValidEmail(emailTrimed))
+        throw new Error("Email not in proper format");
+
+      const user = await User.findOne({ email: emailTrimed }).select(
         "+password"
       );
 
@@ -92,6 +96,44 @@ export const login = {
       return { id: _id, username, email, createdAt, updatedAt };
     } catch (error) {
       error.status = 404;
+      next(error);
+    }
+  },
+};
+
+export const logout = {
+  type: GraphQLString,
+  args: {},
+  resolve: async (_, args, { res, next }) => {
+    try {
+      res.clearCookie("token", {
+        sameSite: config.env == "production" ? "None" : "lax",
+        secure: config.env == "production" ? true : false,
+      });
+      return "Logged out successfully";
+    } catch (error) {
+      next(error);
+    }
+  },
+};
+
+export const updateUser = {
+  type: UserType,
+  description: "Update username",
+  args: {
+    username: { type: GraphQLString },
+  },
+  resolve: async (_, args, { user, next }) => {
+    try {
+      if (!user) throw new Error("Invalid action, you need to signup or login");
+
+      const updated = await User.findByIdAndUpdate(user._id, args, {
+        new: true,
+      });
+
+      return updated;
+    } catch (error) {
+      error.status = 401;
       next(error);
     }
   },

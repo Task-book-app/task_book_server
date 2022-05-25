@@ -5,7 +5,7 @@ const authenticate = async (req, res, next) => {
     const token = req.cookies.token;
 
     const user = await findByToken(token);
-    // console.log(user);
+    // console.log(req);
     req.user = user;
     // console.log(req.user);
     next();

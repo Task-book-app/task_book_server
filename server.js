@@ -19,12 +19,9 @@ app.get("/", (req, res) => {
 
 app.use(
   "/graphql",
-  graphqlHTTP((req) => {
-    console.log("req.body =>", req.body);
-    return {
-      schema,
-      graphiql: true,
-    };
+  graphqlHTTP({
+    schema,
+    graphiql: true,
   })
 );
 
