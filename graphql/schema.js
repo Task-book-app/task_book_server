@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
-import { users } from "./queries/user-queries.js";
+import { users, verifyUser } from "./queries/user-queries.js";
 import {
   register,
   login,
@@ -12,6 +12,7 @@ const QueryType = new GraphQLObjectType({
   description: "The root query type",
   fields: {
     users,
+    verifyUser,
   },
 });
 

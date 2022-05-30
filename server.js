@@ -6,6 +6,7 @@ import config from "./config.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authenticate from "./middlewares/authenticate.js";
+import { getErrorCode } from "./util/errorConstants.js";
 
 const app = express();
 app.use(express.json({ limit: "10MB" }));
@@ -17,13 +18,16 @@ app.get("/", (req, res) => {
   res.send(`<h1>Tasks List Server</h1>`);
 });
 
-app.use(
-  "/graphql",
+app.use("/graphql", (req, res) => {
   graphqlHTTP({
     schema,
     graphiql: true,
-  })
-);
+    customFormatErrorFn: (err) => {
+      const error = getErrorCode(err.message);
+      return { message: error.message, statusCode: error.statusCode };
+    },
+  })(req, res);
+});
 
 app.use((req, res, next) => {
   const error = new Error(`Looks like you are lost...`);
@@ -37,7 +41,7 @@ app.listen(config.port, () => {
 });
 
 app.use(function errorHandler(err, req, res, next) {
-  //   console.log("I am the old handler: =>", err.message);
+  console.log("I am the old handler: =>", err.message);
   res.status(err.status || 400).send({
     error: {
       message: err.message || null,
