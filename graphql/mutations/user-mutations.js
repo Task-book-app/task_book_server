@@ -9,8 +9,10 @@ import {
   isValidEmail,
   isValidPassword,
   passwordIsValid,
+  existingEmail,
 } from "../../util/auth.js";
 import User from "../../models/User.js";
+import { errorName } from "../../util/errorConstants.js";
 
 export const register = {
   type: UserType,
@@ -20,44 +22,42 @@ export const register = {
     email: { type: GraphQLString },
     password: { type: GraphQLString },
   },
-  resolve: async (_, args, { res, next }) => {
-    try {
-      if (!isValidEmail(args.email))
-        throw new Error("Email not in proper format");
+  resolve: async (_, args, { res }) => {
+    const emailTrimed = trimed(args.email);
+    // console.log(existingEmail(emailTrimed));
+    if (await existingEmail(emailTrimed)) throw new Error(errorName.EXISTEMAIL);
 
-      isValidPassword(args.password);
+    if (!isValidEmail(emailTrimed)) throw new Error(errorName.ISVALIDEMAIL);
 
-      const hashedPassword = hashPassword(args.password);
-      const initialname = initialUsername(args.email);
+    isValidPassword(args.password);
 
-      const data = {
-        username: initialname,
-        email: args.email,
-        password: hashedPassword,
-      };
+    const hashedPassword = hashPassword(args.password);
+    const initialname = initialUsername(args.email);
 
-      const newUser = await User.create(data);
-      const { _id, username, email, createdAt, updatedAt } = newUser;
-      const token = createJWToken(_id);
+    const data = {
+      username: initialname,
+      email: emailTrimed,
+      password: hashedPassword,
+    };
 
-      res.cookie("token", token, {
-        expires: new Date(Date.now() + 172800000), //1.728e+8
-        sameSite: config.env == "production" ? "None" : "lax",
-        secure: config.env == "production" ? true : false,
-        httpOnly: true,
-      });
+    const newUser = await User.create(data);
+    const { _id, username, email, createdAt, updatedAt } = newUser;
+    const token = createJWToken(_id);
 
-      return {
-        id: _id,
-        username,
-        email,
-        createdAt,
-        updatedAt,
-      };
-    } catch (error) {
-      error.status = 401;
-      next(error);
-    }
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 172800000), //1.728e+8
+      sameSite: config.env == "production" ? "None" : "lax",
+      secure: config.env == "production" ? true : false,
+      httpOnly: true,
+    });
+
+    return {
+      id: _id,
+      username,
+      email,
+      createdAt,
+      updatedAt,
+    };
   },
 };
 
@@ -70,6 +70,9 @@ export const login = {
   },
   resolve: async (_, args, { res, next }) => {
     try {
+      if (existingEmail(args.email))
+        throw new Error("Email taken, try with other email");
+
       const emailTrimed = trimed(args.email);
       if (!isValidEmail(emailTrimed))
         throw new Error("Email not in proper format");
@@ -103,8 +106,8 @@ export const login = {
 
 export const logout = {
   type: GraphQLString,
-  args: {},
-  resolve: async (_, args, { res, next }) => {
+
+  resolve: async (_, __, { res, next }) => {
     try {
       res.clearCookie("token", {
         sameSite: config.env == "production" ? "None" : "lax",

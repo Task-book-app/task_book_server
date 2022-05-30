@@ -1,4 +1,6 @@
 import { GraphQLString } from "graphql";
+import { errorName } from "../../util/errorConstants.js";
+import { UserType } from "../types/UserType.js";
 
 export const users = {
   type: GraphQLString,
@@ -10,5 +12,14 @@ export const users = {
       console.log(error);
       return error;
     }
+  },
+};
+
+export const verifyUser = {
+  type: UserType,
+  description: "Verify if there is a logged user",
+  resolve: (_, __, { user }) => {
+    if (!user) throw new Error(errorName.UNAUTHENTICATED);
+    return user;
   },
 };
