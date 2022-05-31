@@ -41,11 +41,11 @@ app.listen(config.port, () => {
 });
 
 app.use(function errorHandler(err, req, res, next) {
-  console.log("I am the old handler: =>", err.message);
+  // console.log("I am the old handler: =>", err.message);
   res.status(err.status || 400).send({
     error: {
       message: err.message || null,
-      status: err.status || null,
+      statusCode: err.status || null,
     },
   });
 });
