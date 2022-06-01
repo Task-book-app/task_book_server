@@ -1,5 +1,6 @@
 export const errorName = {
   EXISTEMAIL: "EXISTEMAIL",
+  NOTEXISTEMAIL: "NOTEXISTEMAIL",
   ISVALIDEMAIL: "ISVALIDEMAIL",
   ISVALIDPASSWORDLOWERCASE: "ISVALIDPASSWORDLOWERCASE",
   ISVALIDPASSWORDUPPERCASE: "ISVALIDPASSWORDUPPERCASE",
@@ -8,12 +9,18 @@ export const errorName = {
   ISVALIDPASSWORDLENGTH: "ISVALIDPASSWORDLENGTH",
   NOTUSERFOUND: "NOTUSERFOUND",
   UNAUTHENTICATED: "UNAUTHENTICATED",
+  NOTVALIDPASSWORD: "NOTVALIDPASSWORD",
+  INVALIDACTION: "INVALIDACTION",
 };
 
 export const errorType = {
   EXISTEMAIL: {
     message: "Email taken, try with other email",
     statusCode: 400,
+  },
+  NOTEXISTEMAIL: {
+    message: "Not user with this email found",
+    statusCode: 404,
   },
   ISVALIDEMAIL: {
     message: "Email not in proper format",
@@ -45,6 +52,14 @@ export const errorType = {
   },
   UNAUTHENTICATED: {
     message: "Authentication failed, try to sign up or login again",
+    statusCode: 401,
+  },
+  NOTVALIDPASSWORD: {
+    message: "Invalid password",
+    statusCode: 403,
+  },
+  INVALIDACTION: {
+    message: "Unauthorized Action, log in again",
     statusCode: 401,
   },
 };
