@@ -44,7 +44,7 @@ export const errorType = {
     statusCode: 404,
   },
   UNAUTHENTICATED: {
-    message: "Authentication failed, try to login or sign up again",
+    message: "Authentication failed, try to sign up or login again",
     statusCode: 401,
   },
 };
