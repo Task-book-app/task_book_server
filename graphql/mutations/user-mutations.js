@@ -68,55 +68,39 @@ export const login = {
     email: { type: GraphQLString },
     password: { type: GraphQLString },
   },
-  resolve: async (_, args, { res, next }) => {
-    try {
-      if (existingEmail(args.email))
-        throw new Error("Email taken, try with other email");
+  resolve: async (_, args, { res }) => {
+    const emailTrimed = trimed(args.email);
+    if (!isValidEmail(emailTrimed)) throw new Error(errorName.ISVALIDEMAIL);
 
-      const emailTrimed = trimed(args.email);
-      if (!isValidEmail(emailTrimed))
-        throw new Error("Email not in proper format");
+    const user = await User.findOne({ email: emailTrimed }).select("+password");
 
-      const user = await User.findOne({ email: emailTrimed }).select(
-        "+password"
-      );
+    if (!user) throw new Error(errorName.NOTEXISTEMAIL);
 
-      if (!user) throw new Error("Email not found.");
+    if (!passwordIsValid(args.password, user.password))
+      throw new Error(errorName.NOTVALIDPASSWORD);
+    const token = createJWToken(user._id);
 
-      if (!passwordIsValid(args.password, user.password))
-        throw new Error("Password not valid");
-      const token = createJWToken(user._id);
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 172800000), //1.728e+8
+      sameSite: config.env == "production" ? "None" : "lax",
+      secure: config.env == "production" ? true : false,
+      httpOnly: true,
+    });
 
-      res.cookie("token", token, {
-        expires: new Date(Date.now() + 172800000), //1.728e+8
-        sameSite: config.env == "production" ? "None" : "lax",
-        secure: config.env == "production" ? true : false,
-        httpOnly: true,
-      });
+    const { _id, username, email, createdAt, updatedAt } = user;
 
-      const { _id, username, email, createdAt, updatedAt } = user;
-
-      return { id: _id, username, email, createdAt, updatedAt };
-    } catch (error) {
-      error.status = 404;
-      next(error);
-    }
+    return { id: _id, username, email, createdAt, updatedAt };
   },
 };
 
 export const logout = {
   type: GraphQLString,
-
-  resolve: async (_, __, { res, next }) => {
-    try {
-      res.clearCookie("token", {
-        sameSite: config.env == "production" ? "None" : "lax",
-        secure: config.env == "production" ? true : false,
-      });
-      return "Logged out successfully";
-    } catch (error) {
-      next(error);
-    }
+  resolve: (_, __, { res }) => {
+    res.clearCookie("token", {
+      sameSite: config.env == "production" ? "None" : "lax",
+      secure: config.env == "production" ? true : false,
+    });
+    return "Logged out successfully";
   },
 };
 
@@ -125,19 +109,16 @@ export const updateUser = {
   description: "Update username",
   args: {
     username: { type: GraphQLString },
+    email: { type: GraphQLString },
+    picture: { type: GraphQLString },
   },
-  resolve: async (_, args, { user, next }) => {
-    try {
-      if (!user) throw new Error("Invalid action, you need to signup or login");
+  resolve: async (_, args, { user }) => {
+    if (!user) throw new Error(errorName.INVALIDACTION);
 
-      const updated = await User.findByIdAndUpdate(user._id, args, {
-        new: true,
-      });
+    const updated = await User.findByIdAndUpdate(user._id, args, {
+      new: true,
+    });
 
-      return updated;
-    } catch (error) {
-      error.status = 401;
-      next(error);
-    }
+    return updated;
   },
 };
