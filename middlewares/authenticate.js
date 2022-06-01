@@ -5,6 +5,7 @@ const authenticate = async (req, res, next) => {
     const token = req.cookies.token;
     if (token) {
       const user = await findByToken(token);
+      if (!user) throw new Error("Couldn't find user, login again or signup");
       req.user = user;
     }
     next();
