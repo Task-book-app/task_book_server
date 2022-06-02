@@ -13,6 +13,8 @@ import {
 } from "../../util/auth.js";
 import User from "../../models/User.js";
 import { errorName } from "../../util/errorConstants.js";
+// import { uploadImage } from "../../util/uploadImage.js";
+import { v2 as cloudinary } from "cloudinary";
 
 export const register = {
   type: UserType,
@@ -46,7 +48,7 @@ export const register = {
 
     res.cookie("token", token, {
       expires: new Date(Date.now() + 172800000), //1.728e+8
-      sameSite: config.env == "production" ? "None" : "lax",
+      sameSite: config.env == "production" ? "None" : "Lax",
       secure: config.env == "production" ? true : false,
       httpOnly: true,
     });
@@ -82,19 +84,20 @@ export const login = {
 
     res.cookie("token", token, {
       expires: new Date(Date.now() + 172800000), //1.728e+8
-      sameSite: config.env == "production" ? "None" : "lax",
+      sameSite: config.env == "production" ? "None" : "Lax",
       secure: config.env == "production" ? true : false,
       httpOnly: true,
     });
 
-    const { _id, username, email, createdAt, updatedAt } = user;
+    const { _id, username, email, picture, createdAt, updatedAt } = user;
 
-    return { id: _id, username, email, createdAt, updatedAt };
+    return { id: _id, username, email, picture, createdAt, updatedAt };
   },
 };
 
 export const logout = {
   type: GraphQLString,
+  description: "Log out a user deleting the token cookie",
   resolve: (_, __, { res }) => {
     res.clearCookie("token", {
       sameSite: config.env == "production" ? "None" : "lax",
@@ -106,7 +109,7 @@ export const logout = {
 
 export const updateUser = {
   type: UserType,
-  description: "Update username",
+  description: "Update user information",
   args: {
     username: { type: GraphQLString },
     email: { type: GraphQLString },
@@ -115,9 +118,24 @@ export const updateUser = {
   resolve: async (_, args, { user }) => {
     if (!user) throw new Error(errorName.INVALIDACTION);
 
+    if (args.picture) {
+      await cloudinary.uploader.upload(
+        args.picture,
+        {
+          folder: `tasks_book/users/${user.username}/avatar`,
+          use_filename: true,
+        },
+        (error, result) => {
+          if (error) throw new Error(`Image was not valid`);
+          args.picture = result.secure_url;
+        }
+      );
+    }
+
     const updated = await User.findByIdAndUpdate(user._id, args, {
       new: true,
     });
+    // console.log(updated);
 
     return updated;
   },

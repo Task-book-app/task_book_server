@@ -59,7 +59,7 @@ export const errorType = {
     statusCode: 403,
   },
   INVALIDACTION: {
-    message: "Unauthorized Action, log in again",
+    message: "Unauthorized action, log in again",
     statusCode: 401,
   },
 };
