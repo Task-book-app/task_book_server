@@ -26,7 +26,6 @@ export const register = {
   },
   resolve: async (_, args, { res }) => {
     const emailTrimed = trimed(args.email);
-    // console.log(existingEmail(emailTrimed));
     if (await existingEmail(emailTrimed)) throw new Error(errorName.EXISTEMAIL);
 
     if (!isValidEmail(emailTrimed)) throw new Error(errorName.ISVALIDEMAIL);
@@ -91,7 +90,14 @@ export const login = {
 
     const { _id, username, email, picture, createdAt, updatedAt } = user;
 
-    return { id: _id, username, email, picture, createdAt, updatedAt };
+    return {
+      id: _id,
+      username,
+      email,
+      picture: picture.secure_url ? picture.secure_url : "",
+      createdAt,
+      updatedAt,
+    };
   },
 };
 
@@ -117,17 +123,27 @@ export const updateUser = {
   },
   resolve: async (_, args, { user }) => {
     if (!user) throw new Error(errorName.INVALIDACTION);
+    console.log(args);
+    // await cloudinary.api.resource(
+    //   `tasks_book/users/${user._id}/avatar/ata0v5qgh4uy61lvzeop`,
+    //   (error, result) => {
+    //     console.log("result = ", result, "/", " error = ", error);
+    //   }
+    // );
 
     if (args.picture) {
       await cloudinary.uploader.upload(
         args.picture,
         {
-          folder: `tasks_book/users/${user.username}/avatar`,
+          folder: `tasks_book/users/${user._id}/avatar`,
           use_filename: true,
         },
         (error, result) => {
           if (error) throw new Error(`Image was not valid`);
-          args.picture = result.secure_url;
+          args.picture = {
+            secure_url: result.secure_url,
+            public_id: result.public_id,
+          };
         }
       );
     }
@@ -135,8 +151,16 @@ export const updateUser = {
     const updated = await User.findByIdAndUpdate(user._id, args, {
       new: true,
     });
-    // console.log(updated);
 
-    return updated;
+    const { _id, username, email, picture, createdAt, updatedAt } = updated;
+
+    return {
+      id: _id,
+      username,
+      email,
+      picture: picture.secure_url ? picture.secure_url : "",
+      createdAt,
+      updatedAt,
+    };
   },
 };
