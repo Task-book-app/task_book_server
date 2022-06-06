@@ -123,15 +123,30 @@ export const updateUser = {
   },
   resolve: async (_, args, { user }) => {
     if (!user) throw new Error(errorName.INVALIDACTION);
-    console.log(args);
+
+    // console.log("args", args);
     // await cloudinary.api.resource(
     //   `tasks_book/users/${user._id}/avatar/ata0v5qgh4uy61lvzeop`,
     //   (error, result) => {
     //     console.log("result = ", result, "/", " error = ", error);
     //   }
     // );
+    // console.log(args);
+    if (args.picture === user.picture.secure_url) {
+      console.log("it is");
+      delete args.picture;
+    }
 
     if (args.picture) {
+      if (user.picture.public_id) {
+        await cloudinary.uploader.destroy(
+          user.picture.public_id,
+          (error, result) => {
+            console.log("result:", result, "error", error);
+          }
+        );
+      }
+
       await cloudinary.uploader.upload(
         args.picture,
         {
@@ -139,7 +154,9 @@ export const updateUser = {
           use_filename: true,
         },
         (error, result) => {
+          console.log("error:", error);
           if (error) throw new Error(`Image was not valid`);
+          // console.log(result);
           args.picture = {
             secure_url: result.secure_url,
             public_id: result.public_id,
