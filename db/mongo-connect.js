@@ -1,15 +1,8 @@
 import mongoose from "mongoose";
+import config from "../config.js";
+
 const { connect } = mongoose;
 
-// (async function () {
-//   try {
-//     await connect("mongodb://localhost:27017/tasks-list-db");
-//     console.log("Success connected to MONGODB");
-//   } catch (error) {
-//     console.log(error);
-//   }
-// })();
-
-connect("mongodb://localhost:27017/tasks-list-db")
+connect(config.mongooseUrl)
   .then(() => console.log("success connected to MONGO"))
   .catch((err) => console.log(err));

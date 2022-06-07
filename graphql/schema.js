@@ -1,17 +1,17 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
-import { users, verifyUser } from "./queries/user-queries.js";
+import { verifyUser } from "./queries/user-queries.js";
 import {
   register,
   login,
   logout,
   updateUser,
-} from "./mutations/user-mutations.js";
+} from "./mutations/user_mutations.js";
+import { createTask } from "./mutations/task_mutation.js";
 
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
   description: "The root query type",
   fields: {
-    users,
     verifyUser,
   },
 });
@@ -24,6 +24,7 @@ const MutationType = new GraphQLObjectType({
     login,
     logout,
     updateUser,
+    createTask,
   },
 });
 

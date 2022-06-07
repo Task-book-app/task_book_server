@@ -124,16 +124,7 @@ export const updateUser = {
   resolve: async (_, args, { user }) => {
     if (!user) throw new Error(errorName.INVALIDACTION);
 
-    // console.log("args", args);
-    // await cloudinary.api.resource(
-    //   `tasks_book/users/${user._id}/avatar/ata0v5qgh4uy61lvzeop`,
-    //   (error, result) => {
-    //     console.log("result = ", result, "/", " error = ", error);
-    //   }
-    // );
-    // console.log(args);
     if (args.picture === user.picture.secure_url) {
-      console.log("it is");
       delete args.picture;
     }
 
