@@ -6,7 +6,7 @@ const taskSchema = new Schema(
     task: { type: String, required: true },
     category: { type: String, required: true },
     date: { type: Date, required: true },
-    priority: { type: Number, min: 1, max: 5, required: true },
+    priority: { type: Number, min: 1, max: 4, required: true },
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   {
