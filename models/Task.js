@@ -8,6 +8,7 @@ const taskSchema = new Schema(
     date: { type: Date, required: true },
     priority: { type: Number, min: 1, max: 4, required: true },
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    completed: { type: Boolean, required: true, default: false },
   },
   {
     timestamps: true,

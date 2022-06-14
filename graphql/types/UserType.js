@@ -1,4 +1,10 @@
-import { GraphQLID, GraphQLObjectType, GraphQLString } from "graphql";
+import {
+  GraphQLID,
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLString,
+} from "graphql";
+import { TaskType } from "./TaskType.js";
 
 export const UserType = new GraphQLObjectType({
   name: "UserType",
@@ -10,5 +16,6 @@ export const UserType = new GraphQLObjectType({
     picture: { type: GraphQLString },
     createdAt: { type: GraphQLString },
     updatedAt: { type: GraphQLString },
+    userTasks: { type: new GraphQLList(TaskType) },
   },
 });
