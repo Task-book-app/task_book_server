@@ -1,4 +1,5 @@
 import {
+  GraphQLBoolean,
   GraphQLID,
   GraphQLInt,
   GraphQLObjectType,
@@ -18,11 +19,12 @@ export const TaskType = new GraphQLObjectType({
     createdAt: { type: GraphQLString },
     updatedAt: { type: GraphQLString },
     priority: { type: GraphQLInt },
+    completed: { type: GraphQLBoolean },
     owner: {
       type: UserType,
       async resolve(parent) {
         const user = await User.findById(parent.owner);
-        const returnedData = {
+        return {
           id: user._id,
           username: user.username,
           email: user.email,
@@ -30,7 +32,6 @@ export const TaskType = new GraphQLObjectType({
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         };
-        return returnedData;
       },
     },
   }),

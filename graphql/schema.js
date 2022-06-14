@@ -7,12 +7,15 @@ import {
   updateUser,
 } from "./mutations/user_mutations.js";
 import { createTask } from "./mutations/task_mutation.js";
+import { getUserTasks } from "./queries/task-queries.js";
 
+getUserTasks;
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
   description: "The root query type",
   fields: {
     verifyUser,
+    getUserTasks,
   },
 });
 
