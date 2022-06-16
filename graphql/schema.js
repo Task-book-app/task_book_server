@@ -6,7 +6,12 @@ import {
   logout,
   updateUser,
 } from "./mutations/user_mutations.js";
-import { createTask } from "./mutations/task_mutation.js";
+import {
+  createTask,
+  completedTask,
+  updateTask,
+  deleteTask,
+} from "./mutations/task_mutation.js";
 import { getUserTasks } from "./queries/task-queries.js";
 
 getUserTasks;
@@ -28,6 +33,9 @@ const MutationType = new GraphQLObjectType({
     logout,
     updateUser,
     createTask,
+    completedTask,
+    updateTask,
+    deleteTask,
   },
 });
 

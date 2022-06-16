@@ -11,6 +11,7 @@ export const errorName = {
   UNAUTHENTICATED: "UNAUTHENTICATED",
   NOTVALIDPASSWORD: "NOTVALIDPASSWORD",
   INVALIDACTION: "INVALIDACTION",
+  NOTTASKFOUND: "NOTTASKFOUND",
 };
 
 export const errorType = {
@@ -61,6 +62,10 @@ export const errorType = {
   INVALIDACTION: {
     message: "Unauthorized action, log in again",
     statusCode: 401,
+  },
+  NOTTASKFOUND: {
+    message: "No task found.",
+    statusCode: 404,
   },
 };
 

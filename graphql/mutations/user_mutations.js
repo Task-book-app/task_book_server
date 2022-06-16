@@ -15,6 +15,7 @@ import User from "../../models/User.js";
 import { errorName } from "../../util/errorConstants.js";
 // import { uploadImage } from "../../util/uploadImage.js";
 import { v2 as cloudinary } from "cloudinary";
+import Task from "../../models/Task.js";
 
 export const register = {
   type: UserType,
@@ -88,8 +89,8 @@ export const login = {
       httpOnly: true,
     });
 
+    const userTasks = await Task.find({ owner: user._id });
     const { _id, username, email, picture, createdAt, updatedAt } = user;
-
     return {
       id: _id,
       username,
@@ -97,6 +98,7 @@ export const login = {
       picture: picture.secure_url ? picture.secure_url : "",
       createdAt,
       updatedAt,
+      userTasks,
     };
   },
 };
