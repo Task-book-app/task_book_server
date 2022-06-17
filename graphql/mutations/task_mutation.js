@@ -2,6 +2,7 @@ import { GraphQLInt, GraphQLString, GraphQLBoolean, GraphQLID } from "graphql";
 import Task from "../../models/Task.js";
 import { errorName } from "../../util/errorConstants.js";
 import { TaskType } from "../types/TaskType.js";
+import { SeedPromise } from "../../util/seedsFunctions.js";
 
 export const createTask = {
   type: TaskType,
@@ -37,9 +38,7 @@ export const completedTask = {
     const updatedTask = await Task.findByIdAndUpdate(
       args.id,
       { completed: args.completed },
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     return updatedTask;
@@ -58,9 +57,7 @@ export const updateTask = {
     const updatedTask = await Task.findByIdAndUpdate(
       args.id,
       { task: args.task },
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     if (!updatedTask) throw new Error(errorName.NOTTASKFOUND);
@@ -80,5 +77,41 @@ export const deleteTask = {
     const deletedTask = await Task.findByIdAndDelete(args.id);
     if (!deletedTask) throw new Error(errorName.NOTTASKFOUND);
     return `Task "${deletedTask.task}" was deleted`;
+  },
+};
+
+export const seedTasks = {
+  type: GraphQLString,
+  description: "Authenticated user seeds new fake tasks",
+  resolve: async (_, __, { user }) => {
+    if (!user) throw new Error(errorName.INVALIDACTION);
+
+    try {
+      await Task.deleteMany({ owner: user._id });
+      console.log(`All Tasks are now in a better place... Cancun`);
+    } catch (error) {
+      console.log(error);
+    }
+
+    const homeTasks = new SeedPromise(user._id, "home");
+    const familyTasks = new SeedPromise(user._id, "family");
+    const workTasks = new SeedPromise(user._id, "work");
+    const sportsTasks = new SeedPromise(user._id, "sports");
+
+    try {
+      await Promise.all(
+        homeTasks.addPromise(2),
+        familyTasks.addPromise(2),
+        workTasks.addPromise(2),
+        sportsTasks.addPromise(2)
+      );
+
+      console.log(`****************************************************`);
+      console.log(`All fake tasks have been stored to the DB`);
+      console.log(`****************************************************`);
+    } catch (error) {
+      console.log(error);
+    }
+    return `All fake tasks have been stored to the DB`;
   },
 };
