@@ -11,6 +11,7 @@ import {
   completedTask,
   updateTask,
   deleteTask,
+  seedTasks,
 } from "./mutations/task_mutation.js";
 import { getUserTasks } from "./queries/task-queries.js";
 
@@ -36,6 +37,7 @@ const MutationType = new GraphQLObjectType({
     completedTask,
     updateTask,
     deleteTask,
+    seedTasks,
   },
 });
 
