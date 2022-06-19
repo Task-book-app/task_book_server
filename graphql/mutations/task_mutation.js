@@ -1,4 +1,10 @@
-import { GraphQLInt, GraphQLString, GraphQLBoolean, GraphQLID } from "graphql";
+import {
+  GraphQLInt,
+  GraphQLString,
+  GraphQLBoolean,
+  GraphQLID,
+  GraphQLList,
+} from "graphql";
 import Task from "../../models/Task.js";
 import { errorName } from "../../util/errorConstants.js";
 import { TaskType } from "../types/TaskType.js";
@@ -67,7 +73,7 @@ export const updateTask = {
 };
 
 export const deleteTask = {
-  type: GraphQLString,
+  type: new GraphQLList(TaskType),
   description: "Authenticated user deletes a task",
   args: {
     id: { type: GraphQLID },
@@ -76,7 +82,8 @@ export const deleteTask = {
     if (!user) throw new Error(errorName.INVALIDACTION);
     const deletedTask = await Task.findByIdAndDelete(args.id);
     if (!deletedTask) throw new Error(errorName.NOTTASKFOUND);
-    return `Task "${deletedTask.task}" was deleted`;
+    const updatedList = await Task.find({ owner: user._id });
+    return updatedList;
   },
 };
 
@@ -88,7 +95,9 @@ export const seedTasks = {
 
     try {
       await Task.deleteMany({ owner: user._id });
-      console.log(`All Tasks are now in a better place... Cancun`);
+      console.log(
+        `All Tasks for ${user.username} are now in a better place... Cancun`
+      );
     } catch (error) {
       console.log(error);
     }
