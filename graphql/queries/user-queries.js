@@ -1,6 +1,7 @@
 import Task from "../../models/Task.js";
 import { errorName } from "../../util/errorConstants.js";
 import { UserType } from "../types/UserType.js";
+import { GraphQLList } from "graphql";
 
 export const verifyUser = {
   type: UserType,
