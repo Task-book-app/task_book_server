@@ -21,6 +21,7 @@ const QueryType = new GraphQLObjectType({
   description: "The root query type",
   fields: {
     getUserTasks,
+    // verifyUser,
   },
 });
 

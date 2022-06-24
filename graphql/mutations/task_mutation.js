@@ -26,7 +26,7 @@ export const createTask = {
       ...args,
       owner: user._id,
     };
-    const newTask = Task.create(data);
+    const newTask = await Task.create(data);
     return newTask;
   },
 };
@@ -82,6 +82,7 @@ export const deleteTask = {
     if (!user) throw new Error(errorName.INVALIDACTION);
     const deletedTask = await Task.findByIdAndDelete(args.id);
     if (!deletedTask) throw new Error(errorName.NOTTASKFOUND);
+    // return deletedTask;
     const updatedList = await Task.find({ owner: user._id });
     return updatedList;
   },
@@ -110,9 +111,9 @@ export const seedTasks = {
     try {
       await Promise.all(
         homeTasks.addPromise(2),
-        familyTasks.addPromise(2),
-        workTasks.addPromise(2),
-        sportsTasks.addPromise(2)
+        familyTasks.addPromise(5),
+        workTasks.addPromise(3),
+        sportsTasks.addPromise(6)
       );
 
       console.log(`****************************************************`);
