@@ -14,13 +14,13 @@ export class SeedPromise {
       .map(() => {
         const taskData = {
           task: `${faker.word.adjective()} ${faker.word.noun()} ${faker.word.preposition()} ${faker.word.verb()}`,
-          priority: faker.datatype.number({ min: 1, max: 4 }),
           owner: this.userId,
           completed: faker.datatype.boolean(),
-          date: faker.datatype.datetime({
-            min: this.dateNow.getTime(),
-            max: this.dateNow.setDate(this.dateNow.getDate() + 1),
-          }),
+          // priority: faker.datatype.number({ min: 1, max: 4 }),
+          // date: faker.datatype.datetime({
+          //   min: this.dateNow.getTime(),
+          //   max: this.dateNow.setDate(this.dateNow.getDate() + 1),
+          // }),
           category: this.category,
         };
         console.log(
