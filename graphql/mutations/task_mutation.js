@@ -16,8 +16,8 @@ export const createTask = {
   args: {
     task: { type: GraphQLString },
     category: { type: GraphQLString },
-    date: { type: GraphQLString },
-    priority: { type: GraphQLInt },
+    // date: { type: GraphQLString },
+    // priority: { type: GraphQLInt },
     completed: { type: GraphQLBoolean },
   },
   resolve: async (_, args, { user }) => {
