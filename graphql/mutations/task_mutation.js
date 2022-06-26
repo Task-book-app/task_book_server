@@ -113,7 +113,7 @@ export const seedTasks = {
         homeTasks.addPromise(2),
         familyTasks.addPromise(5),
         workTasks.addPromise(3),
-        sportsTasks.addPromise(6)
+        sportsTasks.addPromise(7)
       );
 
       console.log(`****************************************************`);
