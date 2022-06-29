@@ -15,7 +15,11 @@ app.use(cookieParser());
 app.use(authenticate);
 
 app.get("/", (req, res) => {
-  res.send(`<h1>Tasks List Server</h1>`);
+  res.send(`
+  <h1>Tasks List Server</h1>
+  <a href=${config.backendUrl}>👉 to graphql</a> 
+  
+  `);
 });
 
 app.use("/graphql", (req, res) => {
