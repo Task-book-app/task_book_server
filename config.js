@@ -37,9 +37,7 @@ const config = {
   frontendOrigin: env.FRONTEND_ORIGIN_DEV || env.FRONTEND_ORIGIN_PROD,
   secretKey: env.SECRET_KEY_DEV || env.SECRET_KEY_PROD,
   mongooseUrl: env.MONGOOSE_DB_DEV || env.MONGOOSE_DB_PROD,
-  //   emailVerifyKey: env.EMAIL_VERIF_KEY_DEV || env.EMAIL_VERIF_KEY_PROD,
-  //   email: env.EMAIL,
-  //   email_pass: env.EMAIL_PASS
+  backendUrl: env.BACKEND_URL_DEV || env.BACKEND_URL_PROD,
 };
 
 // console.log("NODE_ENV", process.env);
