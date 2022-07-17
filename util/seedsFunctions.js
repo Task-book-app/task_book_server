@@ -16,7 +16,7 @@ export class SeedPromise {
           task: `${faker.word.adjective()} ${faker.word.noun()} ${faker.word.preposition()} ${faker.word.verb()}`,
           owner: this.userId,
           completed: faker.datatype.boolean(),
-          // priority: faker.datatype.number({ min: 1, max: 4 }),
+          priority: faker.datatype.number({ min: 1, max: 4 }),
           // date: faker.datatype.datetime({
           //   min: this.dateNow.getTime(),
           //   max: this.dateNow.setDate(this.dateNow.getDate() + 1),
