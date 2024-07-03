@@ -103,14 +103,14 @@ export const seedTasks = {
       console.log(error);
     }
 
-    const homeTasks = new SeedPromise(user._id, "home");
+    const homeTasks = new SeedPromise(user._id, "housework");
     const familyTasks = new SeedPromise(user._id, "family");
     const workTasks = new SeedPromise(user._id, "work");
     const sportsTasks = new SeedPromise(user._id, "sports");
 
     try {
       await Promise.all(
-        homeTasks.addPromise(2),
+        homeTasks.addPromise(9),
         familyTasks.addPromise(5),
         workTasks.addPromise(3),
         sportsTasks.addPromise(7)
