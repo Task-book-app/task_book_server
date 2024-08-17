@@ -17,8 +17,7 @@ app.use(authenticate);
 app.get("/", (req, res) => {
   res.send(`
   <h1>Tasks List Server</h1>
-  <a href=${config.backendUrl}>👉 to graphql</a> 
-  
+  <a href=${config.backendUrl}>👉 to graphql</a>
   `);
 });
 

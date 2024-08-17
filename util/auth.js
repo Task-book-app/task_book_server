@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import config from "../config.js";
 import User from "../models/User.js";
-import { errorName } from "./errorConstants.js";
+// import { errorName } from "./errorConstants.js";
 
 export const createJWToken = (userId) => {
   return jwt.sign({ _id: userId }, config.secretKey, {
@@ -26,7 +26,7 @@ export const findByToken = async (token) => {
   let decoded = jwt.verify(token, config.secretKey);
 
   const authorized = await User.findOne({ _id: decoded._id });
-  // if (!authorized) throw new Error(errorName.NOTUSERFOUND);
+  // if (!authorized) throw new Error("USER_NOT_FOUND");
   return authorized;
 };
 
@@ -50,22 +50,20 @@ export const isValidPassword = (password) => {
   // Validate lowercase letters
   const lowerCaseLetters = /[a-z]/g;
   if (!password.match(lowerCaseLetters))
-    throw new Error(errorName.ISVALIDPASSWORDLOWERCASE);
+    throw new Error("INVALID_PASSWORD_LOWERCASE");
 
   // Validate capital letters
   const upperCaseLetters = /[A-Z]/g;
   if (!password.match(upperCaseLetters))
-    throw new Error(errorName.ISVALIDPASSWORDUPPERCASE);
+    throw new Error("INVALID_PASSWORD_UPPERCASE");
 
   // Validate numbers
   const numbers = /[0-9]/g;
-  if (!password.match(numbers))
-    throw new Error(errorName.ISVALIDPASSWORDNUMBER);
+  if (!password.match(numbers)) throw new Error("INVALID_PASSWORD_NUMBER");
 
   // Validate simbols
   const simbols = /[^A-Za-z0-9]/;
-  if (!password.match(simbols))
-    throw new Error(errorName.ISVALIDPASSWORDSIMBOL);
+  if (!password.match(simbols)) throw new Error("INVALID_PASSWORD_SIMBOL");
 
-  if (password.length <= 8) throw new Error(errorName.ISVALIDPASSWORDLENGTH);
+  if (password.length <= 8) throw new Error("INVALID_PASSWORD_LENGTH");
 };
