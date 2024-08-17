@@ -12,7 +12,7 @@ import {
   existingEmail,
 } from "../../util/auth.js";
 import User from "../../models/User.js";
-import { errorName } from "../../util/errorConstants.js";
+// import { errorName } from "../../util/errorConstants.js";
 // import { uploadImage } from "../../util/uploadImage.js";
 import { v2 as cloudinary } from "cloudinary";
 import Task from "../../models/Task.js";
@@ -27,9 +27,9 @@ export const register = {
   },
   resolve: async (_, args, { res }) => {
     const emailTrimed = trimed(args.email);
-    if (await existingEmail(emailTrimed)) throw new Error(errorName.EXISTEMAIL);
+    if (await existingEmail(emailTrimed)) throw new Error("EXISTING_EMAIL");
 
-    if (!isValidEmail(emailTrimed)) throw new Error(errorName.ISVALIDEMAIL);
+    if (!isValidEmail(emailTrimed)) throw new Error("INVALID_EMAIL");
 
     isValidPassword(args.password);
 
@@ -72,14 +72,14 @@ export const login = {
   },
   resolve: async (_, args, { res }) => {
     const emailTrimed = trimed(args.email);
-    if (!isValidEmail(emailTrimed)) throw new Error(errorName.ISVALIDEMAIL);
+    if (!isValidEmail(emailTrimed)) throw new Error("INVALID_EMAIL");
 
     const user = await User.findOne({ email: emailTrimed }).select("+password");
 
-    if (!user) throw new Error(errorName.NOTEXISTEMAIL);
+    if (!user) throw new Error("NOT_EXIST_EMAIL");
 
     if (!passwordIsValid(args.password, user.password))
-      throw new Error(errorName.NOTVALIDPASSWORD);
+      throw new Error("NOT_VALID_PASSWORD");
     const token = createJWToken(user._id);
 
     res.cookie("token", token, {
@@ -124,7 +124,7 @@ export const updateUser = {
     picture: { type: GraphQLString },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error(errorName.INVALIDACTION);
+    if (!user) throw new Error("INVALID_ACTION");
 
     if (args.picture === user.picture.secure_url) {
       delete args.picture;
@@ -179,7 +179,7 @@ export const verifyUser = {
   type: UserType,
   description: "Verify if there is a logged user",
   resolve: async (_, __, { user }) => {
-    if (!user) throw new Error(errorName.UNAUTHENTICATED);
+    if (!user) throw new Error("UNAUTHENTICATED");
     const userTasks = await Task.find({ owner: user._id });
     const { _id, picture, username, email, createdAt, updatedAt } = user;
     return {

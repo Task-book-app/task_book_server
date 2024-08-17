@@ -6,7 +6,7 @@ import {
   GraphQLList,
 } from "graphql";
 import Task from "../../models/Task.js";
-import { errorName } from "../../util/errorConstants.js";
+// import { errorName } from "../../util/errorConstants.js";
 import { TaskType } from "../types/TaskType.js";
 import { SeedPromise } from "../../util/seedsFunctions.js";
 
@@ -21,7 +21,7 @@ export const createTask = {
     completed: { type: GraphQLBoolean },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error(errorName.INVALIDACTION);
+    if (!user) throw new Error("INVALID_ACTION");
     const data = {
       ...args,
       owner: user._id,
@@ -39,7 +39,7 @@ export const completedTask = {
     completed: { type: GraphQLBoolean },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error(errorName.INVALIDACTION);
+    if (!user) throw new Error("INVALID_ACTION");
 
     const updatedTask = await Task.findByIdAndUpdate(
       args.id,
@@ -59,14 +59,14 @@ export const updateTask = {
     task: { type: GraphQLString },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error(errorName.INVALIDACTION);
+    if (!user) throw new Error("INVALID_ACTION");
     const updatedTask = await Task.findByIdAndUpdate(
       args.id,
       { task: args.task },
       { new: true }
     );
 
-    if (!updatedTask) throw new Error(errorName.NOTTASKFOUND);
+    if (!updatedTask) throw new Error("TASK_NOT_FOUND");
 
     return updatedTask;
   },
@@ -79,9 +79,9 @@ export const deleteTask = {
     id: { type: GraphQLID },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error(errorName.INVALIDACTION);
+    if (!user) throw new Error("INVALID_ACTION");
     const deletedTask = await Task.findByIdAndDelete(args.id);
-    if (!deletedTask) throw new Error(errorName.NOTTASKFOUND);
+    if (!deletedTask) throw new Error("TASK_NOT_FOUND");
     // return deletedTask;
     const updatedList = await Task.find({ owner: user._id });
     return updatedList;
@@ -92,7 +92,7 @@ export const seedTasks = {
   type: GraphQLString,
   description: "Authenticated user seeds new fake tasks",
   resolve: async (_, __, { user }) => {
-    if (!user) throw new Error(errorName.INVALIDACTION);
+    if (!user) throw new Error("INVALID_ACTION");
 
     try {
       await Task.deleteMany({ owner: user._id });
