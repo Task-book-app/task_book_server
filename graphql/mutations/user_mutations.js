@@ -124,54 +124,86 @@ export const updateUser = {
     picture: { type: GraphQLString },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error("INVALID_ACTION");
+    try {
+      // console.log("user:", user);
+      if (!user) throw new Error("INVALID_ACTION");
 
-    if (args.picture === user.picture.secure_url) {
-      delete args.picture;
-    }
+      if (args.picture === user.picture.secure_url) {
+        delete args.picture;
+      }
+      // console.log("args", args);
 
-    if (args.picture) {
-      if (user.picture.public_id) {
-        await cloudinary.uploader.destroy(
-          user.picture.public_id,
-          (error, result) => {
-            console.log("result:", result, "error", error);
-          }
-        );
+      if (args.picture) {
+        if (user.picture.public_id) {
+          await cloudinary.uploader
+            .destroy(user.picture.public_id, { invalidate: true })
+            .then((result) => {
+              if (result.result === "not found") {
+                console.error("error at cloudinary.uploader.destroy:", result);
+              } else {
+                console.log({
+                  message: "picture destroyed succesfully",
+                  status: result.result,
+                });
+              }
+            });
+        }
+
+        await cloudinary.uploader
+          .upload(args.picture, {
+            invalidate: true,
+            folder: `tasks_book/users/${user._id}/avatar`,
+            public_id: user._id,
+            resource_type: "auto",
+            unique_filename: true,
+          })
+          .then((result) => {
+            const transformedUrlCld = cloudinary.url(result.public_id, {
+              version: result.version,
+              secure: true,
+              transformation: {
+                height: 150,
+                width: 150,
+                crop: "thumb",
+                gravity: "face",
+                fetch_format: "auto",
+                quality: "auto",
+              },
+            });
+            // console.log(transformedUrlCld);
+
+            args.picture = {
+              secure_url: transformedUrlCld,
+              public_id: result.public_id,
+            };
+          })
+          .catch((error) => {
+            console.error(error);
+            throw new Error("INTERNAL_SERVER_ERROR");
+          });
       }
 
-      await cloudinary.uploader.upload(
-        args.picture,
-        {
-          folder: `tasks_book/users/${user._id}/avatar`,
-          use_filename: true,
-        },
-        (error, result) => {
-          console.log("error:", error);
-          if (error) throw new Error(`Image was not valid`);
-          // console.log(result);
-          args.picture = {
-            secure_url: result.secure_url,
-            public_id: result.public_id,
-          };
-        }
+      const updated = await User.findByIdAndUpdate(user._id, args, {
+        new: true,
+      });
+
+      const { _id, username, email, picture, createdAt, updatedAt } = updated;
+
+      return {
+        id: _id,
+        username,
+        email,
+        picture: picture.secure_url ? picture.secure_url : "",
+        createdAt,
+        updatedAt,
+      };
+    } catch (error) {
+      console.error(
+        "Error in user_mutations - updateUser resolver:",
+        error.message
       );
+      throw new Error(error.message);
     }
-
-    const updated = await User.findByIdAndUpdate(user._id, args, {
-      new: true,
-    });
-
-    const { _id, username, email, picture, createdAt, updatedAt } = updated;
-
-    return {
-      id: _id,
-      username,
-      email,
-      picture: picture.secure_url ? picture.secure_url : "",
-      createdAt,
-      updatedAt,
-    };
   },
 };
 
@@ -179,17 +211,25 @@ export const verifyUser = {
   type: UserType,
   description: "Verify if there is a logged user",
   resolve: async (_, __, { user }) => {
-    if (!user) throw new Error("UNAUTHENTICATED");
-    const userTasks = await Task.find({ owner: user._id });
-    const { _id, picture, username, email, createdAt, updatedAt } = user;
-    return {
-      id: _id,
-      picture: picture.secure_url ? picture.secure_url : "",
-      username,
-      email,
-      createdAt,
-      updatedAt,
-      userTasks,
-    };
+    try {
+      if (!user) throw new Error("UNAUTHENTICATED");
+      const userTasks = await Task.find({ owner: user._id });
+      const { _id, picture, username, email, createdAt, updatedAt } = user;
+      return {
+        id: _id,
+        picture: picture.secure_url ? picture.secure_url : "",
+        username,
+        email,
+        createdAt,
+        updatedAt,
+        userTasks,
+      };
+    } catch (error) {
+      console.error(
+        "Error in user_mutations - verifyUser resolver:",
+        error.message
+      );
+      throw new Error(error.message);
+    }
   },
 };
