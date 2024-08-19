@@ -64,6 +64,8 @@ export const getErrorCode = (message) => {
       return { message: "Unauthorized action, log in again", statusCode: 401 };
     case "TASK_NOT_FOUND":
       return { message: "No task found.", statusCode: 404 };
+    case "INTERNAL_SERVER_ERROR":
+      return { message: "Internal server error", statusCode: 500 };
     default:
       return { message: "Unknown error", statusCode: 500 };
   }
