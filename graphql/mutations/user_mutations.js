@@ -124,20 +124,20 @@ export const logout = {
   type: GraphQLString,
   description: "Log out a user deleting the token cookie",
   resolve: (_, __, { res, user }) => {
-    // try {
-    // if (!user) throw new Error("INVALID_ACTION");
-    res.clearCookie("token", {
-      sameSite: config.env == "production" ? "None" : "lax",
-      secure: config.env == "production" ? true : false,
-    });
-    return "Logged out successfully";
-    // } catch (error) {
-    //   console.error(
-    //     "Error in user_mutations > logout > resolve:",
-    //     error.message
-    //   );
-    //   throw new Error(error.message);
-    // }
+    try {
+      if (!user) throw new Error("INVALID_ACTION");
+      res.clearCookie("token", {
+        sameSite: config.env == "production" ? "None" : "lax",
+        secure: config.env == "production" ? true : false,
+      });
+      return "Logged out successfully";
+    } catch (error) {
+      console.error(
+        "Error in user_mutations > logout > resolve:",
+        error.message
+      );
+      throw new Error(error.message);
+    }
   },
 };
 
