@@ -26,7 +26,6 @@ app.use("/graphql", (req, res) => {
     schema,
     graphiql: true,
     customFormatErrorFn: (err) => {
-      // console.log("Global error handling", err);
       const error = getErrorCode(err.message);
       return { message: error.message, statusCode: error.statusCode };
     },
