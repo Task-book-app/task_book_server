@@ -6,7 +6,6 @@ import {
   GraphQLList,
 } from "graphql";
 import Task from "../../models/Task.js";
-// import { errorName } from "../../util/errorConstants.js";
 import { TaskType } from "../types/TaskType.js";
 import { SeedPromise } from "../../util/seedsFunctions.js";
 
@@ -21,13 +20,21 @@ export const createTask = {
     completed: { type: GraphQLBoolean },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error("INVALID_ACTION");
-    const data = {
-      ...args,
-      owner: user._id,
-    };
-    const newTask = await Task.create(data);
-    return newTask;
+    try {
+      if (!user) throw new Error("INVALID_ACTION");
+      const data = {
+        ...args,
+        owner: user._id,
+      };
+      const newTask = await Task.create(data);
+      return newTask;
+    } catch (error) {
+      console.error(
+        "Error in task_mutations > createTask > resolve:",
+        error.message
+      );
+      throw new Error(error.message);
+    }
   },
 };
 
@@ -39,15 +46,23 @@ export const completedTask = {
     completed: { type: GraphQLBoolean },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error("INVALID_ACTION");
+    try {
+      if (!user) throw new Error("INVALID_ACTION");
 
-    const updatedTask = await Task.findByIdAndUpdate(
-      args.id,
-      { completed: args.completed },
-      { new: true }
-    );
-
-    return updatedTask;
+      const updatedTask = await Task.findByIdAndUpdate(
+        args.id,
+        { completed: args.completed },
+        { new: true }
+      );
+      if (!updatedTask) throw new Error("TASK_NOT_FOUND");
+      return updatedTask;
+    } catch (error) {
+      console.error(
+        "Error in task_mutations > completedTask > resolve:",
+        error.message
+      );
+      throw new Error(error.message);
+    }
   },
 };
 
@@ -59,16 +74,24 @@ export const updateTask = {
     task: { type: GraphQLString },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error("INVALID_ACTION");
-    const updatedTask = await Task.findByIdAndUpdate(
-      args.id,
-      { task: args.task },
-      { new: true }
-    );
+    try {
+      if (!user) throw new Error("INVALID_ACTION");
+      const updatedTask = await Task.findByIdAndUpdate(
+        args.id,
+        { task: args.task },
+        { new: true }
+      );
 
-    if (!updatedTask) throw new Error("TASK_NOT_FOUND");
+      if (!updatedTask) throw new Error("TASK_NOT_FOUND");
 
-    return updatedTask;
+      return updatedTask;
+    } catch (error) {
+      console.error(
+        "Error in task_mutations > updateTask > resolve:",
+        error.message
+      );
+      throw new Error(error.message);
+    }
   },
 };
 
@@ -79,12 +102,20 @@ export const deleteTask = {
     id: { type: GraphQLID },
   },
   resolve: async (_, args, { user }) => {
-    if (!user) throw new Error("INVALID_ACTION");
-    const deletedTask = await Task.findByIdAndDelete(args.id);
-    if (!deletedTask) throw new Error("TASK_NOT_FOUND");
-    // return deletedTask;
-    const updatedList = await Task.find({ owner: user._id });
-    return updatedList;
+    try {
+      if (!user) throw new Error("INVALID_ACTION");
+      const deletedTask = await Task.findByIdAndDelete(args.id);
+      if (!deletedTask) throw new Error("TASK_NOT_FOUND");
+      // return deletedTask;
+      const updatedList = await Task.find({ owner: user._id });
+      return updatedList;
+    } catch (error) {
+      console.error(
+        "Error in task_mutations > deletedTask > resolve:",
+        error.message
+      );
+      throw new Error(error.message);
+    }
   },
 };
 
@@ -121,6 +152,7 @@ export const seedTasks = {
       console.log(`****************************************************`);
     } catch (error) {
       console.log(error);
+      throw new Error(error.message);
     }
     return `All fake tasks have been stored to the DB`;
   },
